@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐸 Skekofficial Templates 🐸</title>
+    <title>🐸 skekofficial templates 🐸</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -31,6 +31,9 @@
         th {
             background-color: #a8d5ba; /* Light green for header */
             color: #333; /* Dark text color for contrast */
+            position: sticky;
+            top: 0; /* Stick to the top */
+            z-index: 1; /* Ensure it stays above other content */
         }
         tr:hover {
             background-color: #c8e6c9; /* Light green background on hover */
@@ -122,7 +125,8 @@
         }
 
         function displayErrorRow(template, tbody) {
-            const tr = document.createElement('tr');
+            const tr = document.createElement
+('tr');
             tr.innerHTML = `
                 <td>${template.id}</td>
                 <td>${template.name || 'N/A'}</td>
@@ -155,4 +159,3 @@
     </table>
 </body>
 </html>
-           
