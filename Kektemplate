@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐸 skekofficial Template 🐸</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center; /* Center the text */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center; /* Center the text within table cells */
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center; /* Center the text within table cells */
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+    <script>
+        const templateData = [
+            {id: 799232, name: "Miners Pack - Season #2 (Whale Pack)", weight: "N/A"},
+            {id: 799215, name: "Miners Pack - Season #2 (Shark Pack)", weight: "N/A"},
+            {id: 799208, name: "Miners Pack - Season #2", weight: "N/A"},
+            {id: 799207, name: "Mythic Miner - Season #2", weight: "60"},
+            {id: 799202, name: "Legendary Miner - Season #2", weight: "30"},
+            {id: 799197, name: "Epic Miner - Season #2", weight: "12"},
+            {id: 799196, name: "Rare Miner - Season #2", weight: "6"},
+            {id: 799195, name: "Uncommon Miner - Season #1", weight: "3"},
+            {id: 799193, name: "Common Miner - Season #2", weight: "1"},
+            {id: 797979, name: "Mythic KekRock", weight: "N/A"},
+            {id: 797978, name: "Legendary KekRock", weight: "N/A"},
+            {id: 797977, name: "Epic KekRock", weight: "N/A"},
+            {id: 797976, name: "Rare KekRock", weight: "N/A"},
+            {id: 797975, name: "Uncommon KekRock", weight: "N/A"},
+            {id: 797974, name: "Common KekRock", weight: "N/A"},
+            {id: 797973, name: "Mythic KekRock Chest", weight: "N/A"},
+            {id: 797972, name: "Legendary KekRock Chest", weight: "N/A"},
+            {id: 797971, name: "Epic KekRock Chest", weight: "N/A"},
+            {id: 797970, name: "Rare KekRock Chest", weight: "N/A"},
+            {id: 797969, name: "Uncommon KekRock Chest", weight: "N/A"},
+            {id: 797966, name: "Common KekRock Chest", weight: "N/A"},
+            {id: 795536, name: "Mythic Miner - Season #1", weight: "69.17"},
+            {id: 795535, name: "Legendary Miner - Season #1", weight: "19.47"},
+            {id: 795534, name: "Epic Miner - Season #1", weight: "6.21"},
+            {id: 795533, name: "Rare Miner - Season #1", weight: "3.23"},
+            {id: 795532, name: "Uncommon Miner - Season #1", weight: "1.62"},
+            {id: 795531, name: "Common Miner - Season #1", weight: "0.30"},
+            {id: 795526, name: "Miners Pack", weight: "N/A"},
+            {id: 793776, name: "Founders Pack", weight: "N/A"}
+        ];
+
+        async function fetchTemplateStats(templateId) {
+            const url = `https://wax.api.atomicassets.io/atomicassets/v1/templates/skekofficial/${templateId}/stats`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                return data.data;
+            } catch (error) {
+                console.error('Error fetching template stats:', error);
+                return null;
+            }
+        }
+
+        async function fetchAllTemplateStats() {
+            const templateStatsArray = [];
+            for (const template of templateData) {
+                const stats = await fetchTemplateStats(template.id);
+                template.stats = stats;
+                templateStatsArray.push(template);
+            }
+            displayTemplateData(templateStatsArray);
+        }
+
+        function displayTemplateData(templateStatsArray) {
+            const tbody = document.getElementById('template-data-body');
+            tbody.innerHTML = ''; // Clear the existing content
+            templateStatsArray.forEach(template => {
+                const tr = document.createElement('tr');
+
+                const tdId = document.createElement('td');
+                tdId.textContent = template.id;
+                tr.appendChild(tdId);
+
+                const tdName = document.createElement('td');
+                tdName.textContent = template.name || 'N/A';
+                tr.appendChild(tdName);
+
+                const tdMiningWeight = document.createElement('td');
+                tdMiningWeight.textContent = template.weight || 'N/A';
+                tr.appendChild(tdMiningWeight);
+
+                const tdAssets = document.createElement('td');
+                tdAssets.textContent = template.stats ? template.stats.assets : 'N/A';
+                tr.appendChild(tdAssets);
+
+                const tdBurned = document.createElement('td');
+                tdBurned.textContent = template.stats ? template.stats.burned : 'N/A';
+                tr.appendChild(tdBurned);
+
+                const tdExistingSupply = document.createElement('td');
+                if (template.stats && template.stats.assets && template.stats.burned) {
+                    tdExistingSupply.textContent = template.stats.assets - template.stats.burned;
+                } else {
+                    tdExistingSupply.textContent = 'N/A';
+                }
+                tr.appendChild(tdExistingSupply);
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.onload = fetchAllTemplateStats;
+    </script>
+</head>
+<body>
+    <h1>🐸 Skekofficial Template 🐸</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Template ID</th>
+                <th>Name</th>
+                <th>Mining Weight</th>
+                <th>Assets</th>
+                <th>Burned 🔥</th>
+                <th>Existing Supply</th>
+            </tr>
+        </thead>
+        <tbody id="template-data-body">
+            <tr>
+                <td colspan="6">Loading template data...</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
