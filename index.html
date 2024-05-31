@@ -8,22 +8,39 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            text-align: center;
+            background-color: #e0ffe0; /* Light green background */
+            color: #333; /* Dark text color for contrast */
         }
         h1 {
-            text-align: center; /* Center the text */
+            color: #4CAF50; /* Dark green color */
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px #8bc34a; /* Light green shadow for a pop effect */
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            text-align: center; /* Center the text within table cells */
+            margin-top: 20px;
+            background-color: #fff; /* White background for table */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center; /* Center the text within table cells */
+            padding: 10px;
         }
         th {
-            background-color: #f4f4f4;
+            background-color: #a8d5ba; /* Light green for header */
+            color: #333; /* Dark text color for contrast */
+        }
+        tr:hover {
+            background-color: #c8e6c9; /* Light green background on hover */
+        }
+        .loading {
+            text-align: center;
+            font-size: 20px;
+            margin-top: 20px;
+            color: #4CAF50; /* Dark green color */
         }
     </style>
     <script>
@@ -35,14 +52,14 @@
             {id: 799202, name: "Legendary Miner - Season #2", weight: "30"},
             {id: 799197, name: "Epic Miner - Season #2", weight: "12"},
             {id: 799196, name: "Rare Miner - Season #2", weight: "6"},
-            {id: 799195, name: "Uncommon Miner - Season #1", weight: "3"},
+            {id: 799195, name: "Uncommon Miner - Season #2", weight: "3"},
             {id: 799193, name: "Common Miner - Season #2", weight: "1"},
-            {id: 797979, name: "Mythic KekRock", weight: "N/A"},
-            {id: 797978, name: "Legendary KekRock", weight: "N/A"},
-            {id: 797977, name: "Epic KekRock", weight: "N/A"},
-            {id: 797976, name: "Rare KekRock", weight: "N/A"},
-            {id: 797975, name: "Uncommon KekRock", weight: "N/A"},
-            {id: 797974, name: "Common KekRock", weight: "N/A"},
+            {id: 797979, name: "Mythic KekRock 🪨", weight: "N/A"},
+            {id: 797978, name: "Legendary KekRock 🪨", weight: "N/A"},
+            {id: 797977, name: "Epic KekRock 🪨", weight: "N/A"},
+            {id: 797976, name: "Rare KekRock 🪨", weight: "N/A"},
+            {id: 797975, name: "Uncommon KekRock 🪨", weight: "N/A"},
+            {id: 797974, name: "Common KekRock 🪨", weight: "N/A"},
             {id: 797973, name: "Mythic KekRock Chest", weight: "N/A"},
             {id: 797972, name: "Legendary KekRock Chest", weight: "N/A"},
             {id: 797971, name: "Epic KekRock Chest", weight: "N/A"},
@@ -63,6 +80,7 @@
             const url = `https://wax.api.atomicassets.io/atomicassets/v1/templates/skekofficial/${templateId}/stats`;
             try {
                 const response = await fetch(url);
+                if (!response.ok) throw new Error('Network response was not ok');
                 const data = await response.json();
                 return data.data;
             } catch (error) {
@@ -72,59 +90,54 @@
         }
 
         async function fetchAllTemplateStats() {
-            const templateStatsArray = [];
-            for (const template of templateData) {
-                const stats = await fetchTemplateStats(template.id);
-                template.stats = stats;
-                templateStatsArray.push(template);
+            const tbody = document.getElementById('template-data-body');
+            tbody.innerHTML = '<tr><td colspan="6" class="loading">Loading template data...</td></tr>';
+            for(let i = 0; i < templateData.length; i++) {
+                const stats = await fetchTemplateStats(templateData[i].id);
+                if(stats) {
+                    templateData[i].stats = stats;
+                    displayTemplateRow(templateData[i], tbody);
+                } else {
+                    displayErrorRow(templateData[i], tbody);
+                }
             }
-            displayTemplateData(templateStatsArray);
+            document.querySelector('.loading').remove();
         }
 
-        function displayTemplateData(templateStatsArray) {
-            const tbody = document.getElementById('template-data-body');
-            tbody.innerHTML = ''; // Clear the existing content
-            templateStatsArray.forEach(template => {
-                const tr = document.createElement('tr');
+        function displayTemplateRow(template, tbody) {
+            const tr = document.createElement('tr');
+            const assets = template.stats ? template.stats.assets : 'N/A';
+            const burned = template.stats ? template.stats.burned : 'N/A';
+            const existingSupply = (template.stats && template.stats.assets && template.stats.burned) ? (template.stats.assets - template.stats.burned) : 'N/A';
 
-                const tdId = document.createElement('td');
-                tdId.textContent = template.id;
-                tr.appendChild(tdId);
+            tr.innerHTML = `
+                <td>${template.id}</td>
+                <td>${template.name || 'N/A'}</td>
+                <td>${template.weight || 'N/A'}</td>
+                <td>${assets}</td>
+                <td>${burned}</td>
+                <td>${existingSupply}</td>
+            `;
 
-                const tdName = document.createElement('td');
-                tdName.textContent = template.name || 'N/A';
-                tr.appendChild(tdName);
+            tbody.appendChild(tr);
+        }
 
-                const tdMiningWeight = document.createElement('td');
-                tdMiningWeight.textContent = template.weight || 'N/A';
-                tr.appendChild(tdMiningWeight);
-
-                const tdAssets = document.createElement('td');
-                tdAssets.textContent = template.stats ? template.stats.assets : 'N/A';
-                tr.appendChild(tdAssets);
-
-                const tdBurned = document.createElement('td');
-                tdBurned.textContent = template.stats ? template.stats.burned : 'N/A';
-                tr.appendChild(tdBurned);
-
-                const tdExistingSupply = document.createElement('td');
-                if (template.stats && template.stats.assets && template.stats.burned) {
-                    tdExistingSupply.textContent = template.stats.assets - template.stats.burned;
-                } else {
-                    tdExistingSupply.textContent = 'N/A';
-                }
-                tr.appendChild(tdExistingSupply);
-
-                tbody.appendChild(tr);
-            });
+        function displayErrorRow(template, tbody) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${template.id}</td>
+                <td>${template.name || 'N/A'}</td>
+                <td colspan="4">Error fetching data</td>
+            `;
+            tbody.appendChild(tr);
         }
 
         window.onload = fetchAllTemplateStats;
     </script>
 </head>
 <body>
-    <h1>🐸 Skekofficial Template 🐸</h1>
-    <table>
+    <h1>🐸 skekofficial Template 🐸</h1>
+    <table role="table" aria-label="Template Data">
         <thead>
             <tr>
                 <th>Template ID</th>
@@ -143,3 +156,4 @@
     </table>
 </body>
 </html>
+           
