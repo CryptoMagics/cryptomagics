@@ -144,7 +144,7 @@
 
                 // Display KEK price
                 const kekPriceElement = document.getElementById('kekPrice');
-                kekPriceElement.innerHTML = `<div>KEK/USD: $${usdPrice.toFixed(12)}</div><div>KEK/WAX: ${systemPrice.toFixed(12)}</div>`;
+                kekPriceElement.innerHTML = `<div>KEK/USD: ${usdPrice.toFixed(12)}</div><div>KEK/WAX: ${systemPrice.toFixed(12)}</div>`;
             } catch (error) {
                 console.error('Error fetching KEK price:', error);
                 const kekPriceElement = document.getElementById('kekPrice');
