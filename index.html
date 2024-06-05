@@ -76,6 +76,10 @@
             height: auto; /* Maintain the aspect ratio */
             
         }
+
+        .top-left-button + .top-left-button {
+            top: 50px;
+        }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script>
@@ -190,6 +194,7 @@
 </head>
 <body>
     <button class="top-left-button" onclick="window.location.href='template.html'">Go to Template</button>
+    <button class="top-left-button" onclick="window.location.href='token.html'" style="top: 50px;">Go to Token Prices</button>
     <div class="container">
         <div class="image-container">
             <a href="https://ibb.co/R0CssZy">
