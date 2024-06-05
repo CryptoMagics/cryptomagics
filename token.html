@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Price Comparator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #509624; /* Primary background color */
+        }
+
+        .container {
+            background-color: #fff;
+            border: 2px solid #20672c; /* Secondary color for border */
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .pixel-font {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            color: #20672c; /* Secondary color for text */
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #20672c; /* Secondary color for section titles */
+        }
+
+        .section-content {
+            font-size: 16px;
+        }
+
+        .top-left-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #20672c; /* Secondary color for button background */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .top-left-button:hover {
+            background-color: #ee0000; /* Accent color for button hover */
+        }
+
+        .loading {
+            color: #20672c; /* Secondary color for loading text */
+        }
+
+        .image-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .image-container img {
+            width: 300px; /* Set the width of the image */
+            height: auto; /* Maintain the aspect ratio */
+            
+        }
+
+        .top-left-button + .top-left-button {
+            top: 50px;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script>
+        async function getTokenPrices() {
+            const endpoints = [
+                {
+                    id: 'kek',
+                    url: 'https://alcor.exchange/api/v2/tokens/kek-waxpepetoken'
+                },
+                {
+                    id: 'aigod',
+                    url: 'https://alcor.exchange/api/v2/tokens/aigod-aigodtokenwx'
+                },
+                {
+                    id: 'wuf',
+                    url: 'https://alcor.exchange/api/v2/tokens/wuf-wuffi'
+                }
+            ];
+
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(endpoint.url);
+                    const result = await response.json();
+                    const usdPrice = result['usd_price'];
+                    const systemPrice = result['system_price'];
+
+                    const priceElement = document.getElementById(`${endpoint.id}Price`);
+                    priceElement.innerHTML = `<div>${endpoint.id.toUpperCase()}/USD: ${usdPrice.toFixed(12)}</div><div>${endpoint.id.toUpperCase()}/WAX: ${systemPrice.toFixed(12)}</div>`;
+                    priceElement.classList.remove('loading');
+                } catch (error) {
+                    console.error(`Error fetching ${endpoint.id} price:`, error);
+                    const priceElement = document.getElementById(`${endpoint.id}Price`);
+                    priceElement.innerText = `Error fetching ${endpoint.id.toUpperCase()} price`;
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            getTokenPrices();
+        });
+    </script>
+</head>
+<body>
+    <button class="top-left-button" onclick="window.location.href='template.html'">Go to Template</button>
+    <button class="top-left-button" onclick="window.location.href='index.html'" style="top: 50px;">Go to Home</button>
+    <div class="container">
+        <div class="image-container">
+            <a href="https://ibb.co/R0CssZy">
+                <img src="https://i.ibb.co/SnKMMWr/Designer-1.jpg" alt="Designer-1" border="0">
+            </a>
+        </div>
+        <div class="section">
+            <div class="section-title pixel-font">KEK Price</div>
+            <div class="section-content pixel-font">
+                <span id="kekPrice" class="loading">Loading...</span>
+            </div>
+        </div>
+        <div class="section">
+            <div class="section-title pixel-font">AIGOD Price</div>
+            <div class="section-content pixel-font">
+                <span id="aigodPrice" class="loading">Loading...</span>
+            </div>
+        </div>
+        <div class="section">
+            <div class="section-title pixel-font">WUF Price</div>
+            <div class="section-content pixel-font">
+                <span id="wufPrice" class="loading">Loading...</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
