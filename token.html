@@ -11,18 +11,24 @@
             margin: 0;
             padding: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             background-color: #509624; /* Primary background color */
+            text-align: center; /* Centering text in the body */
+            position: relative; /* Add relative positioning to the body */
         }
 
         .container {
+            width: 80%; /* Increase the width of the container */
+            max-width: 800px; /* Set a maximum width */
             background-color: #fff;
             border: 2px solid #20672c; /* Secondary color for border */
             border-radius: 8px;
             padding: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center; /* Centering text in the container */
         }
 
         .pixel-font {
@@ -33,23 +39,26 @@
 
         .section {
             margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            align-items: center;
         }
 
         .section-title {
             font-size: 18px;
             font-weight: bold;
-            margin-bottom: 10px;
             color: #20672c; /* Secondary color for section titles */
         }
 
         .section-content {
             font-size: 16px;
+            text-align: center;
         }
 
         .top-left-button {
             position: absolute;
             top: 10px;
-            left: 10px;
             background-color: #20672c; /* Secondary color for button background */
             color: white;
             border: none;
@@ -60,6 +69,14 @@
 
         .top-left-button:hover {
             background-color: #ee0000; /* Accent color for button hover */
+        }
+
+        .top-left-button:first-of-type {
+            left: 10px;
+        }
+
+        .top-left-button:last-of-type {
+            right: 10px;
         }
 
         .loading {
@@ -74,11 +91,6 @@
         .image-container img {
             width: 300px; /* Set the width of the image */
             height: auto; /* Maintain the aspect ratio */
-            
-        }
-
-        .top-left-button + .top-left-button {
-            top: 50px;
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -107,7 +119,12 @@
                     const systemPrice = result['system_price'];
 
                     const priceElement = document.getElementById(`${endpoint.id}Price`);
-                    priceElement.innerHTML = `<div>${endpoint.id.toUpperCase()}/USD: ${usdPrice.toFixed(12)}</div><div>${endpoint.id.toUpperCase()}/WAX: ${systemPrice.toFixed(12)}</div>`;
+                    priceElement.innerHTML = `
+                        <div>${endpoint.id.toUpperCase()}/USD:</div>
+                        <div>${usdPrice.toFixed(12)}</div>
+                        <div>${endpoint.id.toUpperCase()}/WAX:</div>
+                        <div>${systemPrice.toFixed(12)}</div>
+                    `;
                     priceElement.classList.remove('loading');
                 } catch (error) {
                     console.error(`Error fetching ${endpoint.id} price:`, error);
@@ -124,7 +141,7 @@
 </head>
 <body>
     <button class="top-left-button" onclick="window.location.href='template.html'">Go to Template</button>
-    <button class="top-left-button" onclick="window.location.href='index.html'" style="top: 50px;">Go to Home</button>
+    <button class="top-left-button" onclick="window.location.href='index.html'">Go to Home</button>
     <div class="container">
         <div class="image-container">
             <a href="https://ibb.co/GJxR9ZX">
@@ -133,20 +150,20 @@
         </div>
         <div class="section">
             <div class="section-title pixel-font">KEK Price</div>
-            <div class="section-content pixel-font">
-                <span id="kekPrice" class="loading">Loading...</span>
+            <div class="section-content pixel-font" id="kekPrice">
+                <span class="loading">Loading...</span>
             </div>
         </div>
         <div class="section">
             <div class="section-title pixel-font">AIGOD Price</div>
-            <div class="section-content pixel-font">
-                <span id="aigodPrice" class="loading">Loading...</span>
+            <div class="section-content pixel-font" id="aigodPrice">
+                <span class="loading">Loading...</span>
             </div>
         </div>
         <div class="section">
             <div class="section-title pixel-font">WUF Price</div>
-            <div class="section-content pixel-font">
-                <span id="wufPrice" class="loading">Loading...</span>
+            <div class="section-content pixel-font" id="wufPrice">
+                <span class="loading">Loading...</span>
             </div>
         </div>
     </div>
