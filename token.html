@@ -18,6 +18,7 @@
             background-color: #509624; /* Primary background color */
             text-align: center; /* Centering text in the body */
             position: relative; /* Add relative positioning to the body */
+            line-height: 1.4; /* Global line height adjustment */
         }
 
         .container {
@@ -35,6 +36,7 @@
             font-family: 'Press Start 2P', cursive;
             font-size: 16px;
             color: #20672c; /* Secondary color for text */
+            line-height: 1.4; /* Adjust line height for pixel-font */
         }
 
         .section {
@@ -54,6 +56,7 @@
         .section-content {
             font-size: 16px;
             text-align: center;
+            line-height: 1.4; /* Adjust line height for section content */
         }
 
         .top-left-button {
@@ -92,6 +95,19 @@
             width: 300px; /* Set the width of the image */
             height: auto; /* Maintain the aspect ratio */
         }
+
+        .price-block {
+            border: 2px solid #20672c; /* Secondary color for border */
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background-color: #f0f0f0; /* Light background color for the price block */
+        }
+
+        .price-change {
+            font-size: 14px;
+            color: #ff0000; /* Color for price change text */
+        }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script>
@@ -125,6 +141,17 @@
                         <div>${endpoint.id.toUpperCase()}/WAX:</div>
                         <div>${systemPrice.toFixed(12)}</div>
                     `;
+
+                    // Fetch the 24-hour change
+                    const changeResponse = await fetch(`https://api.example.com/${endpoint.id}/24h-change`);
+                    const changeResult = await changeResponse.json();
+                    const priceChange = changeResult['price_change_24h'];
+
+                    const changeElement = document.createElement('div');
+                    changeElement.className = 'price-change';
+                    changeElement.innerHTML = `24h Change: ${priceChange.toFixed(2)}%`;
+
+                    priceElement.appendChild(changeElement);
                     priceElement.classList.remove('loading');
                 } catch (error) {
                     console.error(`Error fetching ${endpoint.id} price:`, error);
@@ -144,25 +171,23 @@
     <button class="top-left-button" onclick="window.location.href='index.html'">Go to Home</button>
     <div class="container">
         <div class="image-container">
-            <a href="https://ibb.co/GJxR9ZX">
-                <img src="https://i.postimg.cc/jjsMZknL/Fresh-idea.png" alt="Designer-1" border="0">
-            </a>
+            <img src="https://i.postimg.cc/jjsMZknL/Fresh-idea.png" alt="Designer-1" border="0">
         </div>
         <div class="section">
-            <div class="section-title pixel-font">KEK Price</div>
-            <div class="section-content pixel-font" id="kekPrice">
+            <div class="section-title pixel-font">KEK Prices</div>
+            <div class="section-content pixel-font price-block" id="kekPrice">
                 <span class="loading">Loading...</span>
             </div>
         </div>
         <div class="section">
-            <div class="section-title pixel-font">AIGOD Price</div>
-            <div class="section-content pixel-font" id="aigodPrice">
+            <div class="section-title pixel-font">AIGOD Prices</div>
+            <div class="section-content pixel-font price-block" id="aigodPrice">
                 <span class="loading">Loading...</span>
             </div>
         </div>
         <div class="section">
-            <div class="section-title pixel-font">WUF Price</div>
-            <div class="section-content pixel-font" id="wufPrice">
+            <div class="section-title pixel-font">WUF Prices</div>
+            <div class="section-content pixel-font price-block" id="wufPrice">
                 <span class="loading">Loading...</span>
             </div>
         </div>
