@@ -103,11 +103,6 @@
             margin-bottom: 20px;
             background-color: #f0f0f0; /* Light background color for the price block */
         }
-
-        .price-change {
-            font-size: 14px;
-            color: #ff0000; /* Color for price change text */
-        }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script>
@@ -141,17 +136,6 @@
                         <div>${endpoint.id.toUpperCase()}/WAX:</div>
                         <div>${systemPrice.toFixed(12)}</div>
                     `;
-
-                    // Fetch the 24-hour change
-                    const changeResponse = await fetch(`https://api.example.com/${endpoint.id}/24h-change`);
-                    const changeResult = await changeResponse.json();
-                    const priceChange = changeResult['price_change_24h'];
-
-                    const changeElement = document.createElement('div');
-                    changeElement.className = 'price-change';
-                    changeElement.innerHTML = `24h Change: ${priceChange.toFixed(2)}%`;
-
-                    priceElement.appendChild(changeElement);
                     priceElement.classList.remove('loading');
                 } catch (error) {
                     console.error(`Error fetching ${endpoint.id} price:`, error);
