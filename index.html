@@ -193,33 +193,48 @@
     </script>
 </head>
 <body>
+    <!-- Top left navigation buttons -->
     <button class="top-left-button" onclick="window.location.href='template.html'">Go to Template</button>
     <button class="top-left-button" onclick="window.location.href='token.html'" style="top: 50px;">Go to Token Prices</button>
+    <!-- New button to go to AIGOD Templates -->
+    <button class="top-left-button" onclick="window.location.href='aigod.html'" style="top: 90px;">Go To AIGOD Templates</button>
+
+    <!-- Main content container -->
     <div class="container">
+        <!-- Image container -->
         <div class="image-container">
             <a href="https://ibb.co/R0CssZy">
                 <img src="https://i.ibb.co/SnKMMWr/Designer-1.jpg" alt="Designer-1" border="0">
             </a>
         </div>
+        
+        <!-- Burned KEK supply section -->
         <div class="section">
             <div class="section-title pixel-font">KEK Burned Supply</div>
             <div class="section-content pixel-font">
                 <span id="burnedSupply" class="loading">Loading...</span>
             </div>
         </div>
+        
+        <!-- WAXP Price section -->
         <div class="section">
             <div class="section-title pixel-font">WAXP Price</div>
             <div class="section-content pixel-font">
                 <span id="waxpPrice" class="loading">Loading...</span>
             </div>
         </div>
+        
+        <!-- KEK Price section -->
         <div class="section">
             <div class="section-title pixel-font">KEK Price</div>
             <div class="section-content pixel-font">
                 <span id="kekPrice" class="loading">Loading...</span>
             </div>
         </div>
+        
+        <!-- Order Book section -->
         <div id="orderBook"></div>
     </div>
+
 </body>
 </html>
