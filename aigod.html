@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Data Extraction</title>
+    <script>
+        let page = 1;
+        let allData = [];
+
+        function fetchData() {
+            const xhr = new XMLHttpRequest();
+            const url = `https://wax.api.atomicassets.io/atomicassets/v1/templates?collection_name=fliptribes&schema_name=aigods&order=desc&sort=created&page=${page}&limit=100`;
+
+            xhr.open('GET', url, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success && response.data.length > 0) {
+                        allData = allData.concat(response.data);
+                        page++;
+                        fetchData();  // Fetch next page
+                    } else {
+                        displayData(allData);
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+        function displayData(data) {
+            const output = document.getElementById('output');
+            output.innerHTML = '';
+
+            if (data.length > 0) {
+                // Sort the data by number_total from highest to lowest
+                const sortedData = data.sort((a, b) => {
+                    return parseInt(b.immutable_data.number_total) - parseInt(a.immutable_data.number_total);
+                });
+
+                sortedData.forEach(item => {
+                    const templateId = item.template_id;
+                    const numberTotal = item.immutable_data.number_total;
+                    const mintedBy = item.immutable_data.minted_by;
+                    const element = item.immutable_data.element;
+                    const nftLink = `https://wax.atomichub.io/explorer/template/fliptribes/${templateId}`;
+
+                    const itemElement = document.createElement('div');
+                    itemElement.innerHTML = `
+                        <strong>Template ID:</strong> ${templateId}, 
+                        <strong>Number Total:</strong> ${numberTotal}, 
+                        <strong>Minted By:</strong> ${mintedBy}, 
+                        <strong>Element:</strong> ${element} 
+                        <a href="${nftLink}" target="_blank">View NFT</a>
+                    `;
+                    output.appendChild(itemElement);
+                });
+            } else {
+                output.innerHTML = 'No data available';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchData);
+    </script>
+</head>
+<body>
+    <h1>API Data Extraction</h1>
+    <div id="output">Loading data...</div>
+</body>
+</html>
