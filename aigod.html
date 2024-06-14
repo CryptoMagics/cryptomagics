@@ -4,6 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Best template by total numbers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .buttons-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .hidden {
+            display: none;
+        }
+        h1, h2 {
+            margin-top: 40px;
+        }
+    </style>
     <script>
         let page = 1;
         let allData = [];
@@ -38,25 +64,159 @@
                     return parseInt(b.immutable_data.number_total) - parseInt(a.immutable_data.number_total);
                 });
 
+                // Create a map for counting elements and rarity features
+                const elementCount = {};
+                const rarityFeatureCount = {};
+                let templateCountWithTen = 0;
+                const templatesWithTen = [];
+
                 sortedData.forEach(item => {
                     const templateId = item.template_id;
                     const numberTotal = item.immutable_data.number_total;
                     const mintedBy = item.immutable_data.minted_by;
                     const element = item.immutable_data.element;
+                    const rarityFeatures = item.immutable_data.rarity_features;
+                    const sideNumbers = item.immutable_data.side_numbers || [];
                     const nftLink = `https://wax.atomichub.io/explorer/template/fliptribes/${templateId}`;
+
+                    // Count elements
+                    if (element) {
+                        if (!elementCount[element]) {
+                            elementCount[element] = 0;
+                        }
+                        elementCount[element]++;
+                    }
+
+                    // Count rarity features
+                    if (rarityFeatures) {
+                        const features = rarityFeatures.split(',').map(f => f.trim());
+                        features.forEach(feature => {
+                            if (!rarityFeatureCount[feature]) {
+                                rarityFeatureCount[feature] = 0;
+                            }
+                            rarityFeatureCount[feature]++;
+                        });
+                    }
+
+                    // Count templates with at least one '10' in side_numbers
+                    if (sideNumbers.includes('10')) {
+                        templateCountWithTen++;
+                        templatesWithTen.push({
+                            templateId,
+                            numberTotal,
+                            mintedBy,
+                            element,
+                            rarityFeatures,
+                            nftLink
+                        });
+                    }
 
                     const itemElement = document.createElement('div');
                     itemElement.innerHTML = `
-                        <strong>Template ID:</strong> ${templateId}, 
+                        <strong>Template ID:</strong> <a href="${nftLink}" target="_blank">${templateId}</a>, 
                         <strong>Number Total:</strong> ${numberTotal}, 
                         <strong>Minted By:</strong> ${mintedBy}, 
-                        <strong>Element:</strong> ${element} 
-                        <a href="${nftLink}" target="_blank">View NFT</a>
+                        <strong>Element:</strong> ${element}, 
+                        <strong>Rarity Feature:</strong> ${rarityFeatures}
                     `;
                     output.appendChild(itemElement);
                 });
+
+                // Display total template count
+                const totalTemplates = sortedData.length;
+                document.getElementById('totalCount').textContent = `Total Templates: ${totalTemplates}`;
+
+                // Save counts to global variables
+                window.elementCount = elementCount;
+                window.templateCountWithTen = templateCountWithTen;
+                window.templatesWithTen = templatesWithTen;
+                window.rarityFeatureCount = rarityFeatureCount;
             } else {
                 output.innerHTML = 'No data available';
+            }
+        }
+
+        function toggleElementCounts() {
+            const elementTable = document.getElementById('elementTable');
+            if (elementTable.classList.contains('hidden')) {
+                elementTable.classList.remove('hidden');
+                displayElementCounts();
+            } else {
+                elementTable.classList.add('hidden');
+            }
+        }
+
+        function displayElementCounts() {
+            const elementTable = document.getElementById('elementTable');
+            elementTable.innerHTML = '<tr><th>Element</th><th>Count</th></tr>';
+            const sortedElements = Object.entries(window.elementCount).sort((a, b) => b[1] - a[1]);
+            for (const [element, count] of sortedElements) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${element}</td><td>${count}</td>`;
+                elementTable.appendChild(row);
+            }
+        }
+
+        function toggleTemplatesWithTen() {
+            const templatesWithTenOutput = document.getElementById('templatesWithTenOutput');
+            if (templatesWithTenOutput.classList.contains('hidden')) {
+                templatesWithTenOutput.classList.remove('hidden');
+                displayTemplatesWithTen();
+            } else {
+                templatesWithTenOutput.classList.add('hidden');
+            }
+        }
+
+        function displayTemplatesWithTen() {
+            const templatesWithTenOutput = document.getElementById('templatesWithTenOutput');
+            templatesWithTenOutput.innerHTML = `<strong>Templates with at least one '10' in side numbers: ${window.templateCountWithTen}</strong>`;
+            window.templatesWithTen.forEach(template => {
+                const templateElement = document.createElement('div');
+                templateElement.innerHTML = `
+                    <strong>Template ID:</strong> <a href="${template.nftLink}" target="_blank">${template.templateId}</a>, 
+                    <strong>Number Total:</strong> ${template.numberTotal}, 
+                    <strong>Minted By:</strong> ${template.mintedBy}, 
+                    <strong>Element:</strong> ${template.element}, 
+                    <strong>Rarity Feature:</strong> ${template.rarityFeatures}
+                `;
+                templatesWithTenOutput.appendChild(templateElement);
+            });
+        }
+
+        function toggleRarityFeatureCounts() {
+            const rarityFeatureTable = document.getElementById('rarityFeatureTable');
+            if (rarityFeatureTable.classList.contains('hidden')) {
+                rarityFeatureTable.classList.remove('hidden');
+                displayRarityFeatureCounts();
+            } else {
+                rarityFeatureTable.classList.add('hidden');
+            }
+        }
+
+        function displayRarityFeatureCounts() {
+            const rarityFeatureTable = document.getElementById('rarityFeatureTable');
+            rarityFeatureTable.innerHTML = '<tr><th>Rarity Feature</th><th>Count</th></tr>';
+            const sortedFeatures = Object.entries(window.rarityFeatureCount).sort((a, b) => b[1] - a[1]);
+            for (const [rarityFeature, count] of sortedFeatures) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${rarityFeature}</td><td>${count}</td>`;
+                rarityFeatureTable.appendChild(row);
+            }
+        }
+
+        function showMoreData() {
+            const moreDataButton = document.getElementById('moreDataButton');
+            const outputDiv = document.getElementById('output');
+            if (moreDataButton.dataset.state === 'initial') {
+                moreDataButton.textContent = 'Restart';
+                moreDataButton.dataset.state = 'restart';
+                outputDiv.classList.add('hidden');
+                document.getElementById('moreData').classList.remove('hidden');
+            } else {
+                moreDataButton.textContent = 'More Data';
+                moreDataButton.dataset.state = 'initial';
+                outputDiv.classList.remove('hidden');
+                document.getElementById('moreData').classList.add('hidden');
             }
         }
 
@@ -64,7 +224,29 @@
     </script>
 </head>
 <body>
+    <button id="moreDataButton" class="button" onclick="showMoreData()" data-state="initial">More Data</button>
+
     <h1>Best template by total numbers</h1>
+    <div id="totalCount">Loading...</div>
     <div id="output">Loading data...</div>
+
+    <div id="moreData" class="hidden">
+        <div class="buttons-container">
+            <button class="button" onclick="toggleElementCounts()">Toggle Element Counts</button>
+            <button class="button" onclick="toggleTemplatesWithTen()">Toggle Templates with '10'</button>
+            <button class="button" onclick="toggleRarityFeatureCounts()">Toggle Rarity Feature Counts</button>
+        </div>
+
+        <div>
+            <h2>Element Counts</h2>
+            <table id="elementTable" class="hidden"></table>
+
+            <h2>Templates with at least one '10' in side numbers</h2>
+            <div id="templatesWithTenOutput" class="hidden"></div>
+
+            <h2>Rarity Feature Counts</h2>
+            <table id="rarityFeatureTable" class="hidden"></table>
+        </div>
+    </div>
 </body>
 </html>
