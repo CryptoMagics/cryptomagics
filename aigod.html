@@ -33,6 +33,7 @@
     <script>
         let page = 1;
         let allData = [];
+        let last10NewestTemplates = []; // Array to store last 10 newest templates
 
         function fetchData() {
             const xhr = new XMLHttpRequest();
@@ -59,9 +60,9 @@
             output.innerHTML = '';
 
             if (data.length > 0) {
-                // Sort the data by number_total from highest to lowest
+                // Sort the data by created_at_time from newest to oldest
                 const sortedData = data.sort((a, b) => {
-                    return parseInt(b.immutable_data.number_total) - parseInt(a.immutable_data.number_total);
+                    return new Date(b.created_at_time).getTime() - new Date(a.created_at_time).getTime();
                 });
 
                 // Create a map for counting elements and rarity features
@@ -111,6 +112,18 @@
                         });
                     }
 
+                    // Store last 10 newest templates
+                    if (last10NewestTemplates.length < 10) {
+                        last10NewestTemplates.push({
+                            templateId,
+                            numberTotal,
+                            mintedBy,
+                            element,
+                            rarityFeatures,
+                            nftLink
+                        });
+                    }
+
                     const itemElement = document.createElement('div');
                     itemElement.innerHTML = `
                         <strong>Template ID:</strong> <a href="${nftLink}" target="_blank">${templateId}</a>, 
@@ -131,6 +144,9 @@
                 window.templateCountWithTen = templateCountWithTen;
                 window.templatesWithTen = templatesWithTen;
                 window.rarityFeatureCount = rarityFeatureCount;
+
+                // Display last 10 newest templates
+                document.getElementById('showLast10Button').classList.remove('hidden');
             } else {
                 output.innerHTML = 'No data available';
             }
@@ -220,6 +236,26 @@
             }
         }
 
+        function showLast10NewestTemplates() {
+            const last10NewestOutput = document.getElementById('last10NewestOutput');
+            last10NewestOutput.innerHTML = '<h2>Last 10 Newest Templates</h2>';
+            last10NewestTemplates.forEach(template => {
+                const templateElement = document.createElement('div');
+                templateElement.innerHTML = `
+                    <strong>Template ID:</strong> <a href="${template.nftLink}" target="_blank">${template.templateId}</a>, 
+                    <strong>Number Total:</strong> ${template.numberTotal}, 
+                    <strong>Minted By:</strong> ${template.mintedBy}, 
+                    <strong>Element:</strong> ${template
+.element}, 
+                    <strong>Rarity Feature:</strong> ${template.rarityFeatures}
+                `;
+                last10NewestOutput.appendChild(templateElement);
+            });
+
+            // Scroll to the last 10 newest templates section
+            last10NewestOutput.scrollIntoView({ behavior: 'smooth' });
+        }
+
         document.addEventListener('DOMContentLoaded', fetchData);
     </script>
 </head>
@@ -232,9 +268,10 @@
 
     <div id="moreData" class="hidden">
         <div class="buttons-container">
-            <button class="button" onclick="toggleElementCounts()">Toggle Element Counts</button>
-            <button class="button" onclick="toggleTemplatesWithTen()">Toggle Templates with '10'</button>
-            <button class="button" onclick="toggleRarityFeatureCounts()">Toggle Rarity Feature Counts</button>
+            <button class="button" onclick="toggleElementCounts()">Display Element Counts</button>
+            <button class="button" onclick="toggleTemplatesWithTen()">Display Templates with "10"</button>
+            <button class="button" onclick="toggleRarityFeatureCounts()">Display Rarity Feature Counts</button>
+            <button id="showLast10Button" class="button hidden" onclick="showLast10NewestTemplates()">Display Last 10 Newest Templates</button>
         </div>
 
         <div>
@@ -246,6 +283,8 @@
 
             <h2>Rarity Feature Counts</h2>
             <table id="rarityFeatureTable" class="hidden"></table>
+
+            <div id="last10NewestOutput"></div>
         </div>
     </div>
 </body>
