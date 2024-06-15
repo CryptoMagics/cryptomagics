@@ -60,9 +60,9 @@
             output.innerHTML = '';
 
             if (data.length > 0) {
-                // Sort the data by created_at_time from newest to oldest
+                // Sort the data by number_total from highest to lowest
                 const sortedData = data.sort((a, b) => {
-                    return new Date(b.created_at_time).getTime() - new Date(a.created_at_time).getTime();
+                    return b.immutable_data.number_total - a.immutable_data.number_total;
                 });
 
                 // Create a map for counting elements and rarity features
@@ -244,9 +244,9 @@
                 templateElement.innerHTML = `
                     <strong>Template ID:</strong> <a href="${template.nftLink}" target="_blank">${template.templateId}</a>, 
                     <strong>Number Total:</strong> ${template.numberTotal}, 
+                    <strong>
                     <strong>Minted By:</strong> ${template.mintedBy}, 
-                    <strong>Element:</strong> ${template
-.element}, 
+                    <strong>Element:</strong> ${template.element}, 
                     <strong>Rarity Feature:</strong> ${template.rarityFeatures}
                 `;
                 last10NewestOutput.appendChild(templateElement);
@@ -262,9 +262,9 @@
 <body>
     <button id="moreDataButton" class="button" onclick="showMoreData()" data-state="initial">More Data</button>
 
-  <h1>Best template by total numbers for <a href="https://wax.atomichub.io/explorer/collection/wax-mainnet/fliptribes" target="_blank">fliptribes</a></h1>
-<div id="totalCount">Loading...</div>
-<div id="output">Loading data...</div>
+    <h1>Best template by total numbers for <a href="https://wax.atomichub.io/explorer/collection/wax-mainnet/fliptribes" target="_blank">fliptribes</a></h1>
+    <div id="totalCount">Loading...</div>
+    <div id="output">Loading data...</div>
 
     <div id="moreData" class="hidden">
         <div class="buttons-container">
