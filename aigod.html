@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Best Template by Total Numbers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOM91SgZXpa1i7urwqkFVnMk5P0sv5I5or2g7BjN" crossorigin="anonymous">
     <style>
         body {
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: 'Roboto', sans-serif;
             background-color: #2b2b2b;
             color: #ffffff;
             margin: 0;
@@ -73,13 +75,63 @@
         .yellow-text {
             color: #ffcc00;
         }
+        .loading-spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #ffcc00;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .centered-text-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .search-container input {
+            padding: 10px;
+            width: 250px;
+            border: 3px solid #ffcc00;
+            border-radius: 8px;
+            background-color: #3a3a3a;
+            color: white;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        #moreDataButton {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
     </style>
     <script>
         let page = 1;
         let allData = [];
         let last10NewestTemplates = [];
 
+        function showLoadingSpinner() {
+            const spinner = document.createElement('div');
+            spinner.className = 'loading-spinner';
+            return spinner;
+        }
+
         function fetchData() {
+            const output = document.getElementById('output');
+            output.innerHTML = '';
+            output.appendChild(showLoadingSpinner());
+
             const xhr = new XMLHttpRequest();
             const url = `https://wax.api.atomicassets.io/atomicassets/v1/templates?collection_name=fliptribes&schema_name=aigods&order=desc&sort=created&page=${page}&limit=100`;
 
@@ -92,7 +144,6 @@
                         page++;
                         fetchData();  // Fetch next page
                     } else {
-                        // Sort data to get the last 10 newest templates
                         last10NewestTemplates = allData.slice().sort((a, b) => new Date(b.created_at_time) - new Date(a.created_at_time)).slice(0, 10);
                         displayData(allData);
                     }
@@ -106,14 +157,22 @@
             output.innerHTML = '';
 
             if (data.length > 0) {
-                // Sort the data by number_total from highest to lowest
                 const sortedData = data.sort((a, b) => b.immutable_data.number_total - a.immutable_data.number_total);
 
-                // Create a map for counting elements and rarity features
                 const elementCount = {};
                 const rarityFeatureCount = {};
                 let templateCountWithTen = 0;
                 const templatesWithTen = [];
+
+                const table = document.createElement('table');
+                const headerRow = table.insertRow();
+                headerRow.innerHTML = `
+                    <th>Template ID</th>
+                    <th>Number Total</th>
+                    <th>Minted By</th>
+                    <th>Element</th>
+                    <th>Rarity Feature</th>
+                `;
 
                 sortedData.forEach(item => {
                     const templateId = item.template_id;
@@ -124,7 +183,6 @@
                     const sideNumbers = item.immutable_data.side_numbers || [];
                     const nftLink = `https://wax.atomichub.io/explorer/template/fliptribes/${templateId}`;
 
-                    // Count elements
                     if (element) {
                         if (!elementCount[element]) {
                             elementCount[element] = 0;
@@ -132,7 +190,6 @@
                         elementCount[element]++;
                     }
 
-                    // Count rarity features
                     if (rarityFeatures) {
                         const features = rarityFeatures.split(',').map(f => f.trim());
                         features.forEach(feature => {
@@ -143,7 +200,6 @@
                         });
                     }
 
-                    // Count templates with at least one '10' in side_numbers
                     if (sideNumbers.includes('10')) {
                         templateCountWithTen++;
                         templatesWithTen.push({
@@ -156,34 +212,50 @@
                         });
                     }
 
-                    const itemElement = document.createElement('div');
-                    itemElement.innerHTML = `
-                        <strong>Template ID:</strong> <a href="${nftLink}" target="_blank">${templateId}</a>, 
-                        <strong>Number Total:</strong> <span class="yellow-text">${numberTotal}</span>, 
-                        <strong>Minted By:</strong> ${mintedBy}, 
-                        <strong>Element:</strong> ${element}, 
-                        <strong>Rarity Feature:</strong> ${rarityFeatures}
+                    const row = table.insertRow();
+                    row.innerHTML = `
+                        <td><a href="${nftLink}" target="_blank">${templateId}</a></td>
+                        <td class="yellow-text">${numberTotal}</td>
+                        <td>${mintedBy}</td>
+                        <td>${element}</td>
+                        <td>${rarityFeatures}</td>
                     `;
-                    output.appendChild(itemElement);
                 });
 
-                // Display total template count
+                output.appendChild(table);
+
                 const totalTemplates = sortedData.length;
                 document.getElementById('totalCount').textContent = `Total Templates: ${totalTemplates}`;
 
-                // Save counts to global variables
                 window.elementCount = elementCount;
                 window.templateCountWithTen = templateCountWithTen;
                 window.templatesWithTen = templatesWithTen;
                 window.rarityFeatureCount = rarityFeatureCount;
 
-                // Display last 10 newest templates button if data exists
                 if (last10NewestTemplates.length > 0) {
                     document.getElementById('showLast10Button').classList.remove('hidden');
                 }
             } else {
                 output.innerHTML = 'No data available';
             }
+        }
+
+        function filterByMintedBy() {
+            const wallet = document.getElementById('walletInput').value.trim();
+            if (wallet) {
+                const filteredData = allData.filter(item => item.immutable_data.minted_by === wallet);
+                displayData(filteredData);
+                document.getElementById('restartButton').classList.remove('hidden');
+            } else {
+                displayData(allData);
+                document.getElementById('restartButton').classList.add('hidden');
+            }
+        }
+
+        function restart() {
+            document.getElementById('walletInput').value = '';
+            displayData(allData);
+            document.getElementById('restartButton').classList.add('hidden');
         }
 
         function toggleElementCounts() {
@@ -219,18 +291,30 @@
 
         function displayTemplatesWithTen() {
             const templatesWithTenOutput = document.getElementById('templatesWithTenOutput');
-            templatesWithTenOutput.innerHTML = `<strong>Templates with at least one '10' in side numbers: ${window.templateCountWithTen}</strong>`;
+            templatesWithTenOutput.innerHTML = `<p><strong>Templates with '10' in side numbers:</strong> ${window.templateCountWithTen}</p>`;
+
+            const table = document.createElement('table');
+            const headerRow = table.insertRow();
+            headerRow.innerHTML = `
+                <th>Template ID</th>
+                <th>Number Total</th>
+                <th>Minted By</th>
+                <th>Element</th>
+                <th>Rarity Feature</th>
+            `;
+
             window.templatesWithTen.forEach(template => {
-                const templateElement = document.createElement('div');
-                templateElement.innerHTML = `
-                    <strong>Template ID:</strong> <a href="${template.nftLink}" target="_blank">${template.templateId}</a>, 
-                    <strong>Number Total:</strong> <span class="yellow-text">${template.numberTotal}</span>, 
-                    <strong>Minted By:</strong> ${template.mintedBy}, 
-                    <strong>Element:</strong> ${template.element}, 
-                    <strong>Rarity Feature:</strong> ${template.rarityFeatures}
+                const row = table.insertRow();
+                row.innerHTML = `
+                    <td><a href="${template.nftLink}" target="_blank">${template.templateId}</a></td>
+                    <td class="yellow-text">${template.numberTotal}</td>
+                    <td>${template.mintedBy}</td>
+                    <td>${template.element}</td>
+                    <td>${template.rarityFeatures}</td>
                 `;
-                templatesWithTenOutput.appendChild(templateElement);
             });
+
+            templatesWithTenOutput.appendChild(table);
         }
 
         function toggleRarityFeatureCounts() {
@@ -267,51 +351,75 @@
         function displayLast10NewestTemplates() {
             const last10NewestOutput = document.getElementById('last10NewestOutput');
             last10NewestOutput.innerHTML = '<h2>Last 10 Newest Templates</h2>';
+
+            const table = document.createElement('table');
+            const headerRow = table.insertRow();
+            headerRow.innerHTML = `
+                <th>Template ID</th>
+                <th>Number Total</th>
+                <th>Minted By</th>
+                <th>Element</th>
+                <th>Rarity Feature</th>
+            `;
+
             last10NewestTemplates.forEach(template => {
-                const templateElement = document.createElement('div');
-                templateElement.innerHTML = `
-                    <strong>Template ID:</strong> <a href="https://wax.atomichub.io/explorer/template/fliptribes/${template.template_id}" target="_blank">${template.template_id}</a>, 
-                    <strong>Number Total:</strong> <span class="yellow-text">${template.immutable_data.number_total}</span>, 
-                    <strong>Minted By:</strong> ${template.immutable_data.minted_by}, 
-                    <strong>Element:</strong> ${template.immutable_data.element}, 
-                    <strong>Rarity Feature:</strong> ${template.immutable_data.rarity_features}
+                const row = table.insertRow();
+                row.innerHTML = `
+                    <td><a href="https://wax.atomichub.io/explorer/template/fliptribes/${template.template_id}" target="_blank">${template.template_id}</a></td>
+                    <td class="yellow-text">${template.immutable_data.number_total}</td>
+                    <td>${template.immutable_data.minted_by}</td>
+                    <td>${template.immutable_data.element}</td>
+                    <td>${template.immutable_data.rarity_features}</td>
                 `;
-                last10NewestOutput.appendChild(templateElement);
             });
+
+            last10NewestOutput.appendChild(table);
         }
 
         function showMoreData() {
             const moreDataButton = document.getElementById('moreDataButton');
             const outputDiv = document.getElementById('output');
             if (moreDataButton.dataset.state === 'initial') {
-                moreDataButton.textContent = 'Restart';
                 moreDataButton.dataset.state = 'restart';
                 outputDiv.classList.add('hidden');
                 document.getElementById('moreData').classList.remove('hidden');
             } else {
-                moreDataButton.textContent = 'More Data';
                 moreDataButton.dataset.state = 'initial';
                 outputDiv.classList.remove('hidden');
                 document.getElementById('moreData').classList.add('hidden');
             }
         }
 
-        document.addEventListener('DOMContentLoaded', fetchData);
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchData();
+
+            document.getElementById('walletInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    filterByMintedBy();
+                }
+            });
+
+            document.getElementById('restartButton').addEventListener('click', restart);
+        });
     </script>
 </head>
 <body>
     <button id="moreDataButton" class="button" onclick="showMoreData()" data-state="initial">More Data</button>
-
     <h1>Best Template by Total Numbers for <a href="https://wax.atomichub.io/explorer/collection/wax-mainnet/fliptribes" target="_blank">fliptribes</a></h1>
+    <div class="search-container">
+        <input type="text" id="walletInput" placeholder="Enter wallet to filter by 'Minted By'">
+        <button class="button" onclick="filterByMintedBy()"><i class="fas fa-search"></i> Search</button>
+        <button id="restartButton" class="button hidden"><i class="fas fa-redo"></i> Restart</button>
+    </div>
     <div id="totalCount">Loading...</div>
     <div id="output">Loading data...</div>
 
     <div id="moreData" class="hidden">
         <div class="buttons-container">
-            <button class="button" onclick="toggleElementCounts()">Display Element Counts</button>
-            <button class="button" onclick="toggleTemplatesWithTen()">Display Templates with "10"</button>
-            <button class="button" onclick="toggleRarityFeatureCounts()">Display Rarity Feature Counts</button>
-            <button id="showLast10Button" class="button hidden" onclick="toggleLast10NewestTemplates()">Display Last 10 Newest Templates</button>
+            <button class="button" onclick="toggleElementCounts()"><i class="fas fa-atom"></i> Display Element Counts</button>
+            <button class="button" onclick="toggleTemplatesWithTen()"><i class="fas fa-clipboard-list"></i> Display Templates with "10"</button>
+            <button class="button" onclick="toggleRarityFeatureCounts()"><i class="fas fa-star"></i> Display Rarity Feature Counts</button>
+            <button id="showLast10Button" class="button hidden" onclick="toggleLast10NewestTemplates()"><i class="fas fa-clock"></i> Display Last 10 Newest Templates</button>
         </div>
 
         <div>
