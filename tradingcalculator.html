@@ -216,7 +216,7 @@
         const exitPriceInput = document.getElementById(`exitPrice-${token}`);
         const adjustment = livePrice * percentage;
         const newExitPrice = livePrice + adjustment;
-        exitPriceInput.value = newExitPrice.toFixed(2);
+        exitPriceInput.value = newExitPrice.toFixed(4);
     }
 
     function calculate(token) {
