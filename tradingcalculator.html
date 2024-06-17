@@ -10,40 +10,98 @@
             margin: 20px;
             display: flex;
             justify-content: center;
+            background-color: #f4f4f4;
+            color: #333;
         }
+
         .container-wrapper {
             display: flex;
             justify-content: space-between;
             gap: 20px;
+            flex-wrap: wrap;
         }
+
         .container {
             width: 300px;
             padding: 20px;
             border: 1px solid #ccc;
             border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
+
         .input-group {
             margin-bottom: 15px;
         }
+
         .input-group label {
             display: block;
             margin-bottom: 5px;
         }
+
         .input-group input {
             width: 100%;
             padding: 8px;
             box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
+
+        .mini-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .mini-buttons button {
+            padding: 3px 6px;
+            font-size: 0.9em;
+            border: none;
+            border-radius: 3px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .mini-buttons button:hover {
+            background-color: #0056b3;
+        }
+
         .result {
             margin-top: 20px;
             font-size: 1.2em;
             font-weight: bold;
         }
+
         button {
             width: 100%;
             padding: 10px;
             font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: white;
             cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        @media (max-width: 768px) {
+            .container-wrapper {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .container {
+                width: 100%;
+                max-width: 400px;
+            }
         }
     </style>
 </head>
@@ -63,6 +121,14 @@
         <div class="input-group">
             <label for="exitPrice-waxp">Exit Price (USD):</label>
             <input type="number" id="exitPrice-waxp" step="0.01">
+            <div class="mini-buttons">
+                <button title="Increase by 5%" onclick="adjustExitPrice('waxp', 0.05)">+5%</button>
+                <button title="Decrease by 5%" onclick="adjustExitPrice('waxp', -0.05)">-5%</button>
+                <button title="Increase by 10%" onclick="adjustExitPrice('waxp', 0.10)">+10%</button>
+                <button title="Decrease by 10%" onclick="adjustExitPrice('waxp', -0.10)">-10%</button>
+                <button title="Increase by 25%" onclick="adjustExitPrice('waxp', 0.25)">+25%</button>
+                <button title="Decrease by 25%" onclick="adjustExitPrice('waxp', -0.25)">-25%</button>
+            </div>
         </div>
         <div class="result" id="result-waxp">Gain/Loss: $0.00</div>
         <button onclick="calculate('waxp')">Calculate</button>
@@ -81,6 +147,14 @@
         <div class="input-group">
             <label for="exitPrice-sol">Exit Price (USD):</label>
             <input type="number" id="exitPrice-sol" step="0.01">
+            <div class="mini-buttons">
+                <button title="Increase by 5%" onclick="adjustExitPrice('sol', 0.05)">+5%</button>
+                <button title="Decrease by 5%" onclick="adjustExitPrice('sol', -0.05)">-5%</button>
+                <button title="Increase by 10%" onclick="adjustExitPrice('sol', 0.10)">+10%</button>
+                <button title="Decrease by 10%" onclick="adjustExitPrice('sol', -0.10)">-10%</button>
+                <button title="Increase by 25%" onclick="adjustExitPrice('sol', 0.25)">+25%</button>
+                <button title="Decrease by 25%" onclick="adjustExitPrice('sol', -0.25)">-25%</button>
+            </div>
         </div>
         <div class="result" id="result-sol">Gain/Loss: $0.00</div>
         <button onclick="calculate('sol')">Calculate</button>
@@ -99,6 +173,14 @@
         <div class="input-group">
             <label for="exitPrice-eth">Exit Price (USD):</label>
             <input type="number" id="exitPrice-eth" step="0.01">
+            <div class="mini-buttons">
+                <button title="Increase by 5%" onclick="adjustExitPrice('eth', 0.05)">+5%</button>
+                <button title="Decrease by 5%" onclick="adjustExitPrice('eth', -0.05)">-5%</button>
+                <button title="Increase by 10%" onclick="adjustExitPrice('eth', 0.10)">+10%</button>
+                <button title="Decrease by 10%" onclick="adjustExitPrice('eth', -0.10)">-10%</button>
+                <button title="Increase by 25%" onclick="adjustExitPrice('eth', 0.25)">+25%</button>
+                <button title="Decrease by 25%" onclick="adjustExitPrice('eth', -0.25)">-25%</button>
+            </div>
         </div>
         <div class="result" id="result-eth">Gain/Loss: $0.00</div>
         <button onclick="calculate('eth')">Calculate</button>
@@ -123,6 +205,18 @@
             livePriceInput.value = 'Error fetching price';
             console.error(`Error fetching live ${elementId.toUpperCase()} price:`, error);
         }
+    }
+
+    function adjustExitPrice(token, percentage) {
+        const livePrice = parseFloat(document.getElementById(`livePrice-${token}`).value);
+        if (isNaN(livePrice)) {
+            alert('Live price is not available.');
+            return;
+        }
+        const exitPriceInput = document.getElementById(`exitPrice-${token}`);
+        const adjustment = livePrice * percentage;
+        const newExitPrice = livePrice + adjustment;
+        exitPriceInput.value = newExitPrice.toFixed(2);
     }
 
     function calculate(token) {
