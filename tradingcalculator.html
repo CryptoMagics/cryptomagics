@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container-wrapper {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .container {
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-wrapper">
+    <div class="container" id="container-waxp">
+        <h2>WAXP Trading Calculator</h2>
+        <div class="input-group">
+            <label for="positionValue-waxp">Position Value (USD):</label>
+            <input type="number" id="positionValue-waxp" step="0.01">
+        </div>
+        <div class="input-group">
+            <label for="livePrice-waxp">Live WAXP Price (USD):</label>
+            <input type="text" id="livePrice-waxp" readonly>
+        </div>
+        <div class="input-group">
+            <label for="exitPrice-waxp">Exit Price (USD):</label>
+            <input type="number" id="exitPrice-waxp" step="0.01">
+        </div>
+        <div class="result" id="result-waxp">Gain/Loss: $0.00</div>
+        <button onclick="calculate('waxp')">Calculate</button>
+    </div>
+
+    <div class="container" id="container-sol">
+        <h2>SOL Trading Calculator</h2>
+        <div class="input-group">
+            <label for="positionValue-sol">Position Value (USD):</label>
+            <input type="number" id="positionValue-sol" step="0.01">
+        </div>
+        <div class="input-group">
+            <label for="livePrice-sol">Live SOL Price (USD):</label>
+            <input type="text" id="livePrice-sol" readonly>
+        </div>
+        <div class="input-group">
+            <label for="exitPrice-sol">Exit Price (USD):</label>
+            <input type="number" id="exitPrice-sol" step="0.01">
+        </div>
+        <div class="result" id="result-sol">Gain/Loss: $0.00</div>
+        <button onclick="calculate('sol')">Calculate</button>
+    </div>
+
+    <div class="container" id="container-eth">
+        <h2>ETH Trading Calculator</h2>
+        <div class="input-group">
+            <label for="positionValue-eth">Position Value (USD):</label>
+            <input type="number" id="positionValue-eth" step="0.01">
+        </div>
+        <div class="input-group">
+            <label for="livePrice-eth">Live ETH Price (USD):</label>
+            <input type="text" id="livePrice-eth" readonly>
+        </div>
+        <div class="input-group">
+            <label for="exitPrice-eth">Exit Price (USD):</label>
+            <input type="number" id="exitPrice-eth" step="0.01">
+        </div>
+        <div class="result" id="result-eth">Gain/Loss: $0.00</div>
+        <button onclick="calculate('eth')">Calculate</button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        await fetchLivePrice('wax', 'waxp');
+        await fetchLivePrice('solana', 'sol');
+        await fetchLivePrice('ethereum', 'eth');
+    });
+
+    async function fetchLivePrice(tokenId, elementId) {
+        const livePriceInput = document.getElementById(`livePrice-${elementId}`);
+        try {
+            const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${tokenId}&vs_currencies=usd`);
+            const data = await response.json();
+            const livePrice = data[tokenId].usd;
+            livePriceInput.value = livePrice.toFixed(4);
+        } catch (error) {
+            livePriceInput.value = 'Error fetching price';
+            console.error(`Error fetching live ${elementId.toUpperCase()} price:`, error);
+        }
+    }
+
+    function calculate(token) {
+        const positionValue = parseFloat(document.getElementById(`positionValue-${token}`).value);
+        const livePrice = parseFloat(document.getElementById(`livePrice-${token}`).value);
+        const exitPrice = parseFloat(document.getElementById(`exitPrice-${token}`).value);
+
+        if (isNaN(positionValue) || isNaN(livePrice) || isNaN(exitPrice)) {
+            alert('Please enter valid numbers in all fields.');
+            return;
+        }
+
+        const tokenAmount = positionValue / livePrice;
+        const finalValue = tokenAmount * exitPrice;
+        const gainLoss = finalValue - positionValue;
+
+        document.getElementById(`result-${token}`).innerText = `Gain/Loss: $${gainLoss.toFixed(2)}`;
+    }
+</script>
+
+</body>
+</html>
